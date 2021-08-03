@@ -5,14 +5,19 @@ orbs:
   node: circleci/node@4.1
 
 jobs:
-  test:
+  deploy:
     docker:
       - image: cimg/node:16.6.0
     steps:
       - checkout
-      - run: echo "this is the test job"
+      - node/install-packages
+      - run: 
+          name: "Setup custom env variables"
+          command: echo 'export NETLIFY_SITE_ID="$NETLIFY_SITE_ID"' >> $BASH_ENV
+      - run: npm run build
+      - run: ./node_modules/netlify-cli/bin/run deploy --prod
 
 workflows:
-  test: 
+  deploy-site: 
     jobs:
-      - test
+      - deploy
